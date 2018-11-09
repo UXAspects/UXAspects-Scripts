@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { basename, join, cwd } = require('path');
+const { basename, join } = require('path');
 const { createGzip, createGunzip } = require('zlib');
 const { createReadStream, createWriteStream, mkdirpSync } = require('fs-extra');
 const { extract, pack } = require('tar-stream');
@@ -15,7 +15,7 @@ const gzip = createGzip();
 const tarExtract = extract();
 const tarPack = pack();
 
-const outputDir = cwd();
+const outputDir = process.cwd();
 const outputFile = join(outputDir, getOutputFileName(basename(tarFile)));
 
 mkdirpSync(outputDir);
