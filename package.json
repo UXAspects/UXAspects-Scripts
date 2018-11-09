@@ -1,9 +1,9 @@
 {
   "name": "@ux-aspects/ux-aspects-scripts",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Build scripts for UX Aspects distributables.",
   "bin": {
-    "ux-reversion-package": "./bin/reversion-package.js",
+    "ux-npm-reversion": "./bin/reversion-package.js",
     "ux-setversion": "./bin/setversion.js"
   },
   "author": "",

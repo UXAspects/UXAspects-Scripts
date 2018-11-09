@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const { basename, join } = require('path');
+const { basename, join, cwd } = require('path');
 const { createGzip, createGunzip } = require('zlib');
 const { createReadStream, createWriteStream, mkdirpSync } = require('fs-extra');
 const { extract, pack } = require('tar-stream');
 
 const tarFile = process.argv[2];
-const version = process.env.VERSION;
+const version = process.env.VERSION || process.argv[3];
 
 const filenameRegex = /^([\w\-]*\w+)\-\d+\.\d+\.\d+/;
 
@@ -15,7 +15,7 @@ const gzip = createGzip();
 const tarExtract = extract();
 const tarPack = pack();
 
-const outputDir = join('target', 'npm-release');
+const outputDir = cwd();
 const outputFile = join(outputDir, getOutputFileName(basename(tarFile)));
 
 mkdirpSync(outputDir);
