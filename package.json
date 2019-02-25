@@ -1,9 +1,9 @@
 {
   "name": "@ux-aspects/ux-aspects-scripts",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "Build scripts for UX Aspects distributables.",
   "bin": {
-    "ux-npm-reversion": "./bin/npm-reversion.js",
+    "ux-package-artifactory": "./bin/package-artifactory.js",
     "ux-setversion": "./bin/setversion.js",
     "ux-setversion-release": "./bin/setversion-release.js"
   },
@@ -11,7 +11,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "fs-extra": "7.0.0",
+    "glob": "^7.1.3",
     "semver": "^5.6.0",
-    "tar-stream": "1.6.2"
+    "xml2js": "^0.4.19"
   }
 }
