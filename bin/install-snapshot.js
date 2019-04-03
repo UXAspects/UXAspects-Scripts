@@ -3,15 +3,13 @@
 const { execSync } = require('child_process');
 const { readFileSync, writeFileSync } = require('fs');
 const { argv, env } = require('process');
-const { getVersionWithoutPrerelease } = require('@ux-aspects/ux-aspects-scripts/lib/version');
+const { getVersionWithoutPrerelease } = require('../lib/version');
 
 const snapshotRegistry = 'https://svsartifactory.swinfra.net/artifactory/api/npm/saas-npm-dev-local';
 
-const packages = argv.slice(2);
-
 if (env['RE_BUILD_TYPE'] === 'continuous') {
 
-    const version = `${getVersionWithoutPrerelease(env['VERSION'])}-SNAPSHOT`;
+    const packages = getNpmPackages(argv.slice(2));
 
     const execOptions = { stdio: [0, 1, 2] };
 
@@ -27,12 +25,55 @@ if (env['RE_BUILD_TYPE'] === 'continuous') {
 
     // Install snapshot packages
     for (const package of packages) {
-        console.log(`Installing: ${package}@${version}`);
-        execSync(`npm install ${package}@${version}`, execOptions);
+        console.log(`Installing: ${package}`);
+        execSync(`npm install ${package}`, execOptions);
     }
 
     // Revert temporary config
     setNpmConfig(originalConfig)
+}
+
+
+/**
+ * Convert input args to an array of NPM package names with versions (`package@version`).
+ * @param {string[]} args An array of either NPM package names, or the format `groupId:artifactId:npmPackageName`.
+ */
+function getNpmPackages(args) {
+
+    // Get dependency info from official-build.props
+    const versions = getDependenciesWithVersions();
+
+    // Match args with version info from official-build.props
+    return args.map(arg => {
+        const pos = arg.lastIndexOf(':');
+        const name = arg.substr(0, pos);
+        const packageName = arg.substr(pos + 1);
+        const version = versions[name] || `${getVersionWithoutPrerelease(env['VERSION'])}-SNAPSHOT`;
+        return `${packageName}@${version}`;
+    });
+}
+
+/** Extract artifact names and versions from official-build.props as key/value pairs. */
+function getDependenciesWithVersions() {
+
+    let result = {};
+    try {
+        const text = readFileSync('official-build.props', 'utf8');
+        const matches = text.match(/^ADDITIONAL_DEPENDENCIES=(.+)$/m);
+        if (matches.length >= 2) {
+            const dependencies = matches[1].split(',');
+            result = dependencies.reduce((acc, val) => {
+                const pos = val.lastIndexOf(':');
+                acc[val.substr(0, pos)] = val.substr(pos + 1);
+                return acc;
+            }, {});
+        }
+    }
+    catch (error) {
+        console.warn(error);
+    }
+
+    return result;
 }
 
 /** Return .npmrc as a key/value object. */
