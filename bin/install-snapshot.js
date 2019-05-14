@@ -7,7 +7,7 @@ const { getVersionWithoutPrerelease } = require('../lib/version');
 
 const snapshotRegistry = 'https://svsartifactory.swinfra.net/artifactory/api/npm/saas-npm-dev-local';
 
-if (env['RE_BUILD_TYPE'] === 'continuous') {
+if (!env['RE_BUILD_TYPE'] || env['RE_BUILD_TYPE'] === 'continuous') {
 
     const packages = getNpmPackages(argv.slice(2));
 
@@ -48,6 +48,13 @@ function getNpmPackages(args) {
         const pos = arg.lastIndexOf(':');
         const name = arg.substr(0, pos);
         const packageName = arg.substr(pos + 1);
+
+        // If the package name contains an NPM version specifier, just return that
+        if (packageName.indexOf('@', 1) > 0) {
+            return packageName;
+        }
+
+        // Use the version mapped from official-build.props if available; otherwise the environment version.
         const version = versions[name] || `${getVersionWithoutPrerelease(env['VERSION'])}-SNAPSHOT`;
         return `${packageName}@${version}`;
     });
