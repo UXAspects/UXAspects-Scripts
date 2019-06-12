@@ -5,7 +5,7 @@ const { copySync, unlinkSync } = require('fs-extra');
 const glob = require('glob');
 const { basename, join } = require('path');
 const { argv, env, cwd } = require('process');
-const { getVersionWithoutPrerelease, setManifestVersion } = require('../lib/version');
+const { getVersionForRelease, setManifestVersion } = require('../lib/version');
 
 const args = argv.slice(2);
 
@@ -30,7 +30,7 @@ unlinkSync(package);
 if (env['RE_BUILD_TYPE'] === 'release') {
 
     // For a release candidate build, get the version without the prerelease suffix
-    const releaseVersion = getVersionWithoutPrerelease(env['VERSION']);
+    const releaseVersion = getVersionForRelease(env['VERSION']);
 
     // Update the manifest with the release version
     setManifestVersion(join(packageDir, 'package.json'), releaseVersion);
