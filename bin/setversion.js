@@ -2,12 +2,12 @@
 
 const { argv, env, exit } = require('process');
 const { existsSync } = require('fs-extra');
-const { getPomVersion, setManifestVersion } = require('../lib/version');
+const { getPomVersion, getVersionWithoutPrerelease, setManifestVersion } = require('../lib/version');
 
 (async () => {
 
     // extract the version from the environment variable or pom.xml
-    const version = env.VERSION || await getPomVersion('pom.xml');
+    const version = env.VERSION || getVersionWithoutPrerelease(await getPomVersion('pom.xml'));
 
     console.log(version);
 

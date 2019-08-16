@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+/**
+ * Take an existing .tgz file and prepare it for publishing to Artifactory:
+ * 1. Move the existing package file to `target/artifactory`.
+ * 2. (If a release candidate build) Update the version number ready for release, re-package, and move it to
+ *    `target/release-staging`.
+ * Relevant environment variables:
+ * - `RE_BUILD_TYPE` - build type from SEPG.
+ * - `VERSION` - version from SEPG.
+ * - `VERSION_PRERELEASE` - optional, customize the prerelease affix.
+ */
+
 const { execSync } = require('child_process');
 const { copySync, unlinkSync } = require('fs-extra');
 const glob = require('glob');
@@ -29,8 +40,9 @@ unlinkSync(package);
 
 if (env['RE_BUILD_TYPE'] === 'release') {
 
-    // For a release candidate build, get the version without the prerelease suffix
-    const releaseVersion = getVersionForRelease(env['VERSION']);
+    // For a release candidate build, get the version without the prerelease suffix.
+    // A custom prerelease suffix specified by VERSION_PRERELEASE can replace it.
+    const releaseVersion = getVersionForRelease(env['VERSION'], env['VERSION_PRERELEASE']);
 
     // Update the manifest with the release version
     setManifestVersion(join(packageDir, 'package.json'), releaseVersion);
