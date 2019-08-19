@@ -2,12 +2,23 @@
 
 const { argv, env, exit } = require('process');
 const { existsSync } = require('fs-extra');
-const { getPomVersion, getVersionWithoutPrerelease, setManifestVersion } = require('../lib/version');
+const { prerelease } = require('semver');
+const { getPomVersion, getVersionForRelease, getVersionWithoutPrerelease, setManifestVersion } = require('../lib/version');
 
 (async () => {
 
     // extract the version from the environment variable or pom.xml
-    const version = env.VERSION || getVersionWithoutPrerelease(await getPomVersion('pom.xml'));
+    let version;
+    if (env.VERSION) {
+        version = getVersionForRelease(env.VERSION, env.VERSION_PRERELEASE);
+        const buildPrerelease = prerelease(env.VERSION);
+        if (buildPrerelease) {
+            version += '-' + buildPrerelease.join('.');
+        }
+    } else {
+        // Used in dev environment only
+        version = getVersionWithoutPrerelease(await getPomVersion('pom.xml'));
+    }
 
     console.log(version);
 
