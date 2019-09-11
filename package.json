@@ -1,6 +1,6 @@
 {
   "name": "@ux-aspects/ux-aspects-scripts",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Build scripts for UX Aspects distributables.",
   "bin": {
     "ux-install-snapshot": "./bin/install-snapshot.js",
