@@ -23,14 +23,17 @@ if (!env['RE_BUILD_TYPE'] || env['RE_BUILD_TYPE'] === 'continuous') {
 
     setNpmConfig(tempConfig);
 
-    // Install snapshot packages
-    for (const package of packages) {
-        console.log(`Installing: ${package}`);
-        execSync(`npm install ${package}`, execOptions);
+    try {
+        // Install snapshot packages
+        for (const package of packages) {
+            console.log(`Installing: ${package}`);
+            execSync(`npm install --save-dev ${package}`, execOptions);
+        }
     }
-
-    // Revert temporary config
-    setNpmConfig(originalConfig)
+    finally {
+        // Revert temporary config
+        setNpmConfig(originalConfig);
+    }
 }
 
 
