@@ -15,6 +15,8 @@ const { argv, env } = require('process');
 const { getNpmPackages, install, useSnapshotRegistry } = require('../lib/install');
 
 const snapshotRegistry = 'https://svsartifactory.swinfra.net/artifactory/api/npm/saas-npm-dev-local';
+const versionRegex = /^\d+\.\d+\.\d+-(.+)-SNAPSHOT$/;
+const packageRegex = /^.+@\d+\.\d+\.\d+/;
 
 if (!env['RE_BUILD_TYPE'] || env['RE_BUILD_TYPE'] === 'continuous') {
 
@@ -39,12 +41,18 @@ if (!env['RE_BUILD_TYPE'] || env['RE_BUILD_TYPE'] === 'continuous') {
 }
 
 /**
- * Get a package name with the version replaced by the current build version.
- * @param {string} package Package name, e.g. "@ux-aspects/ux-aspects@1.8.8".
+ * Get a package name with the version affix replaced by the current build version affix.
+ * E.g. `@ux-aspects/ux-aspects@1.8.8-SNAPSHOT` => `@ux-aspects/ux-aspects@1.8.8-new-feature-SNAPSHOT`.
+ * @param {string} package Package name including version, e.g. `@ux-aspects/ux-aspects@1.8.8-SNAPSHOT`.
  */
 function getPackageForCurrentFeature(package) {
-    if (env['VERSION']) {
-        return package.substr(0, package.lastIndexOf('@') + 1) + env['VERSION'];
+
+    const versionMatch = versionRegex.exec(env['VERSION']);
+    if (versionMatch) {
+        const packageMatch = packageRegex.exec(package);
+        if (packageMatch) {
+            return `${packageMatch[0]}-${versionMatch[1]}-SNAPSHOT`;
+        }
     }
 
     return package;
