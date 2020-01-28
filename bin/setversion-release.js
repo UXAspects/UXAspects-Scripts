@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// Deprecated
+
 const { existsSync } = require('fs');
 const { cwd } = require('process');
 const { join } = require('path');
