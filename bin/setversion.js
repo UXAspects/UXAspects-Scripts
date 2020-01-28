@@ -2,22 +2,19 @@
 
 const { argv, env, exit } = require('process');
 const { existsSync } = require('fs-extra');
-const { prerelease } = require('semver');
-const { getPomVersion, getVersionForRelease, getVersionWithoutPrerelease, setManifestVersion } = require('../lib/version');
+const { getPomVersion, getVersionForCI, getVersionForRelease, setManifestVersion } = require('../lib/version');
 
 (async () => {
 
     // extract the version from the environment variable or pom.xml
     let version;
     if (env.VERSION) {
-        version = getVersionForRelease(env.VERSION, env.VERSION_PRERELEASE);
-        const buildPrerelease = prerelease(env.VERSION);
-        if (buildPrerelease) {
-            version += '-' + buildPrerelease.join('.');
-        }
+        // Get the version number with invalid characters removed.
+        // Not using the VERSION_PRERELEASE for CI builds in order to simplify installing dependencies.
+        version = getVersionForCI(env.VERSION);
     } else {
-        // Used in dev environment only
-        version = getVersionWithoutPrerelease(await getPomVersion('pom.xml'));
+        // Used in dev environment only to roll over the version after release
+        version = getVersionForRelease(await getPomVersion('pom.xml'));
     }
 
     console.log(version);
