@@ -74,7 +74,7 @@ function createPackage(packageDir) {
 
     const execOptions = { cwd: packageDir, encoding: 'utf8' };
 
-    const packageFile = execSync('npm pack --ignore-scripts --quiet', execOptions).trim();
+    const packageFile = execSync('npm pack --ignore-scripts --silent', execOptions).trim();
 
     return join(packageDir, packageFile);
 }
